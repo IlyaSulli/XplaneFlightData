@@ -2,6 +2,8 @@
 
 This repository contains flight calculation code for data published by the X-Plane [Web API](https://developer.x-plane.com/article/x-plane-web-api/). It demonstrates the **Joint Strike Fighter Air Vehicle C++ Coding Standards** (JSF AV C++). The `compliant/` directory contains code adhering to the JSF standard, while `non-compliant/` contains working but non-compliant version.
 
+<img width="1790" height="1132" alt="mfd_display" src="https://github.com/user-attachments/assets/c577fd40-6d1b-4e2a-a500-d3593338ee63" />
+
 The main non-compliant code examples are marked with `REMOVE BEFORE FLIGHT` tags showing violations with:
 
 1. **Exceptions** — *AV Rule 208*
