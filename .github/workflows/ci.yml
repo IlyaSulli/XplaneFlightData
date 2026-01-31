@@ -19,7 +19,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential
-          
+
       - name: Build C++ code
         run: |
           make
@@ -39,4 +39,4 @@ jobs:
       # ---- PYTHON TESTS ----
       - name: Run Python validation tests
         run: |
-          python actions_test/test_outputs.py
+          python test_calculators.py
