@@ -1,47 +1,17 @@
 # Makefile for X-Plane MFD and Flight Calculators
-# Supports both JSF-compliant and non-compliant versions
+# Single non-compliant calculator build
 
 CXX = g++
-# JSF-compliant flags: strict warnings, optimization, C++20
-CXXFLAGS_COMPLIANT = -std=c++20 -O3 -Wall -Wextra -Wpedantic -Werror=return-type -Icompliant
-# Non-compliant flags: standard C++20, less strict
-CXXFLAGS_NON_COMPLIANT = -std=c++20 -O3 -Wall -Wextra
-
-# Default to compliant version
-CXXFLAGS = $(CXXFLAGS_COMPLIANT)
-SRC_DIR = compliant
+CXXFLAGS = -std=c++20 -O3 -Wall -Wextra
+SRC_DIR = calculators
 
 # Calculator names (built in root directory)
 TARGETS = wind_calculator flight_calculator turn_calculator vnav_calculator density_altitude_calculator
 
-.PHONY: all compliant non-compliant clean test run install-fonts jsf-check help switch-compliant switch-non-compliant
+.PHONY: all clean test run install-fonts jsf-check help status
 
-# Default target: build compliant version
-all: compliant
-
-# Build JSF-compliant version
-compliant:
-	@echo "========================================"
-	@echo "Building JSF-COMPLIANT calculators"
-	@echo "Source: compliant/"
-	@echo "========================================"
-	@$(MAKE) switch-compliant
-	@$(MAKE) build-all SRC_DIR=compliant CXXFLAGS="$(CXXFLAGS_COMPLIANT)"
-	@echo ""
-	@echo "JSF-compliant calculators built successfully!"
-	@echo "Run with: ./run_mfd.sh"
-
-# Build non-compliant version
-non-compliant:
-	@echo "========================================"
-	@echo "Building NON-COMPLIANT calculators"
-	@echo "Source: non-compliant/"
-	@echo "========================================"
-	@$(MAKE) switch-non-compliant
-	@$(MAKE) build-all SRC_DIR=non-compliant CXXFLAGS="$(CXXFLAGS_NON_COMPLIANT)"
-	@echo ""
-	@echo "Non-compliant calculators built successfully!"
-	@echo "Run with: ./run_mfd.sh"
+# Default target: build all calculators
+all: build-all
 
 # Internal target to build all calculators from specified directory
 build-all: wind_calculator flight_calculator turn_calculator vnav_calculator density_altitude_calculator
@@ -71,19 +41,9 @@ density_altitude_calculator:
 	$(CXX) $(CXXFLAGS) -o density_altitude_calculator $(SRC_DIR)/density_altitude_calculator.cpp
 	@echo "✓ Density altitude calculator built!"
 
-# Create marker file to indicate which version is active
-switch-compliant:
-	@echo "compliant" > .active_version
-	@echo "Switched to JSF-COMPLIANT version"
-
-switch-non-compliant:
-	@echo "non-compliant" > .active_version
-	@echo "Switched to NON-COMPLIANT version"
-
 clean:
 	@echo "Cleaning build artifacts..."
 	rm -f $(TARGETS)
-	rm -f .active_version
 	rm -rf __pycache__
 	rm -f *.pyc
 	@echo "Clean complete!"
@@ -103,32 +63,13 @@ run: $(TARGETS)
 	@./run_mfd.sh
 
 jsf-check:
-	@echo "Checking JSF AV C++ Coding Standard compliance..."
-	@if [ -f .active_version ] && [ "$$(cat .active_version)" = "compliant" ]; then \
-		echo "✓ Currently using JSF-COMPLIANT version"; \
-		echo "✓ AV Rule 208: No exceptions (throw/catch/try) used"; \
-		echo "✓ AV Rule 209: Fixed-width types via jsf_types.h"; \
-		echo "✓ AV Rule 206: No dynamic memory allocation"; \
-		echo "✓ AV Rule 119: No recursion (binomial_coefficient is iterative)"; \
-		echo "✓ AV Rule 113: Single exit points"; \
-		echo "✓ AV Rule 157/204: No side effects in boolean operators"; \
-		echo "All calculators are JSF-compliant!"; \
-	else \
-		echo "Currently using NON-COMPLIANT version"; \
-		echo "To build compliant version: make compliant"; \
-	fi
+	@echo "JSF compliance checks are not applicable for this project."
 
 status:
 	@echo "========================================"
 	@echo "X-Plane Calculator Build Status"
 	@echo "========================================"
-	@if [ -f .active_version ]; then \
-		VERSION=$$(cat .active_version); \
-		echo "Active version: $$VERSION"; \
-		echo "Source directory: $$VERSION/"; \
-	else \
-		echo "Active version: unknown (run 'make compliant' or 'make non-compliant')"; \
-	fi
+	@echo "Source directory: $(SRC_DIR)/"
 	@echo ""
 	@echo "Built executables:"
 	@for calc in $(TARGETS); do \
@@ -142,13 +83,10 @@ status:
 help:
 	@echo "========================================"
 	@echo "X-Plane MFD Makefile"
-	@echo "JSF AV C++ Coding Standard Support"
 	@echo "========================================"
 	@echo ""
 	@echo "Build Targets:"
-	@echo "  make                    - Build JSF-compliant version (default)"
-	@echo "  make compliant          - Build JSF-compliant calculators from compliant/"
-	@echo "  make non-compliant      - Build non-compliant calculators from non-compliant/"
+	@echo "  make                    - Build all calculators (default)"
 	@echo "  make clean              - Remove build artifacts"
 	@echo ""
 	@echo "Run Targets:"
@@ -169,11 +107,9 @@ help:
 	@echo "  • wind_calculator            - Wind vector calculations"
 	@echo ""
 	@echo "Source directories:"
-	@echo "  • compliant/            - JSF AV C++ Standard compliant code"
-	@echo "  • non-compliant/        - Original non-compliant code"
+	@echo "  • calculators/          - Calculator source code"
 	@echo ""
 	@echo "Examples:"
-	@echo "  make compliant && make run    - Build compliant and run MFD"
-	@echo "  make non-compliant && make test - Build non-compliant and test"
+	@echo "  make                      - Build all calculators"
+	@echo "  make clean                - Clean build artifacts"
 	@echo "========================================"
-

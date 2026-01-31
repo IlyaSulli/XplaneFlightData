@@ -123,7 +123,7 @@ def test_wind_calculator():
 def test_calculator(filename, arguments, expected_output):
     print("Testing " + filename)
     script_dir = Path(__file__).parent
-    calculator_path = script_dir / ("../" + filename)
+    calculator_path = script_dir / (filename)
 
     if not calculator_path.exists():
         print(filename + " not found")
@@ -191,7 +191,15 @@ def compare_json(expected, actual, tol=1e-2):
 
     return errors
 
+def run(cmd):
+    print(f"Running: {' '.join(cmd)}")
+    result = subprocess.run(cmd)
+    if result.returncode != 0:
+        sys.exit(result.returncode)
+
 def main():
+    run(["make", "clean"])
+    run(["make"])
     test_turn_calculator()
     test_vnav_calculator()
     test_density_altitude_calculator()

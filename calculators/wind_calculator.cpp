@@ -22,7 +22,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <numbers>
-#include <jsf_types.h>
+#include "jsf_types.h"
 
 namespace xplane_mfd::calc {
 

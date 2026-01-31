@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <cstring>
 #include <cstdlib>
-#include <jsf_types.h>
+#include "jsf_types.h"
 
 namespace xplane_mfd::calc {
 
