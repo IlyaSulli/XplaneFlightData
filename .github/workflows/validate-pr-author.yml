@@ -1,0 +1,55 @@
+name: Validate PR Author Details
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate name and email in PR description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+
+            const nameMatch = body.match(/Name:\s*(.+)/i);
+            const emailMatch = body.match(/Email:\s*([^\s]+)/i);
+
+            const errors = [];
+
+            if (!nameMatch || !nameMatch[1].trim()) {
+              errors.push("Missing **Name** in PR description.");
+            }
+
+            if (!emailMatch || !emailMatch[1].trim()) {
+              errors.push("Missing **Email** in PR description.");
+            } else {
+              const email = emailMatch[1].trim();
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+              if (!emailRegex.test(email)) {
+                errors.push("Email format is invalid.");
+              }
+            }
+
+            if (errors.length > 0) {
+              const message = `
+                ❌ **PR validation failed**
+
+                ${errors.map(e => `- ${e}`).join("\n")}
+
+                Please update the PR description to match the template.
+              `;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: message
+              });
+
+              core.setFailed("PR description validation failed.");
+            }
