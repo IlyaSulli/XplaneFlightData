@@ -225,23 +225,22 @@ int main(int argc, char* argv[]) {
     
     // Parse optional force_error flag
     if (argc == 6) {
-        force_exception =
-            (std::strcmp(argv[5], "1") == 0 ||
-            std::strcmp(argv[5], "true") == 0);
+        if (!parse_int32(argv[5], force_error)) {
+            force_error = 0;
+        }
     }
     
-    if (force_exception) {
+    if (force_error != 0) {
         return error_simulated;
-        // throw std::runtime_error("CRITICAL: Required dataref 'sim/weather/isa_deviation' not found in X-Plane API");
     }
     
-    // Validate inputs
-    if (pressure_altitude_ft < -2000 || pressure_altitude_ft > 60000) {
+    // Validate inputs against known ranges
+    if (pressure_altitude_ft < min_altitude_ft || pressure_altitude_ft > max_altitude_ft) {
         std::cerr << "Warning: Pressure altitude outside typical range\n";
         return error_parse_failed;
     }
     
-    if (oat_celsius < -60 || oat_celsius > 60) {
+    if (oat_celsius < min_temperature_c || oat_celsius > max_temperature_c) {
         std::cerr << "Warning: Temperature outside typical range\n";
         return error_parse_failed;
     }
