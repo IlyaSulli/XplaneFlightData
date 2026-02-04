@@ -214,7 +214,6 @@ int main(int argc, char* argv[]) {
     // ========================================================================
     // REMOVE BEFORE FLIGHT - Exception
     // ========================================================================
-    try {
         double pressure_altitude_ft = parse_double(argv[1]);
         double oat_celsius = parse_double(argv[2]);
         double ias_kts = parse_double(argv[3]);
@@ -229,16 +228,16 @@ int main(int argc, char* argv[]) {
         }
         
         if (force_exception) {
-            throw std::runtime_error("CRITICAL: Required dataref 'sim/weather/isa_deviation' not found in X-Plane API");
+            return error_simulated;
         }
         
         // Validate inputs
         if (pressure_altitude_ft < -2000 || pressure_altitude_ft > 60000) {
-            std::cerr << "Warning: Pressure altitude outside typical range\n";
+            return error_invalid_args;
         }
         
         if (oat_celsius < -60 || oat_celsius > 60) {
-            std::cerr << "Warning: Temperature outside typical range\n";
+            return error_invalid_args;
         }
         
         DensityAltitudeData da = calculate_density_altitude_data(
@@ -247,11 +246,5 @@ int main(int argc, char* argv[]) {
         
         print_json(da);
         
-        return 0;
-        
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
-        print_usage(argv[0]);
-        return 1;
-    }
+        return error_success;
 }
