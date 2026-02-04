@@ -204,23 +204,26 @@ void print_usage(const char* program_name) {
 int main(int argc, char* argv[]) {
     using namespace xplane_mfd::calc;
     
-    Int32 return_code = error_success; // hint
-    
     if (argc != 5 && argc != 6) {
         print_usage(argv[0]);
         return error_simulated;
     }
     
-    // ========================================================================
-    // REMOVE BEFORE FLIGHT - Exception
-    // ========================================================================
-    double pressure_altitude_ft = parse_double(argv[1]);
-    double oat_celsius = parse_double(argv[2]);
-    double ias_kts = parse_double(argv[3]);
-    double tas_kts = parse_double(argv[4]);
+    // JSF-compliant parsing without exceptions (AV Rule 208)
+    Float64 pressure_altitude_ft, oat_celsius, ias_kts, tas_kts;
+    Int32 force_error = 0;
     
-    // Check for force exception flag
-    bool force_exception = false;
+    // Parse all required arguments
+    if (!parse_float64(argv[1], pressure_altitude_ft) ||
+        !parse_float64(argv[2], oat_celsius) ||
+        !parse_float64(argv[3], ias_kts) ||
+        !parse_float64(argv[4], tas_kts)) {
+        std::cerr << "Error: Invalid numeric argument\n";
+        print_usage(argv[0]);
+        return error_parse_failed;
+    }
+    
+    // Parse optional force_error flag
     if (argc == 6) {
         force_exception =
             (std::strcmp(argv[5], "1") == 0 ||
